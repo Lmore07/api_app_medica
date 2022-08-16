@@ -41,8 +41,8 @@ user.listar_medicos = async (req, res) => {
 //se agrega una nueva persona
 user.nuevapersona = async (req, res) => {
     try {
-        const { cedula, nombres, apellidos, correo, password, fecha_naci, genero, direccion, ciudad,celular, tipo_sangre,discapacidad,rol,estado } = req.body;        
-        let status = await Usuario.registrapersona(cedula, nombres, apellidos, correo, password, fecha_naci, genero, direccion, ciudad,celular, tipo_sangre,discapacidad,rol,estado);
+        const { cedula, nombres, apellidos,especialidad, correo, password, fecha_naci,celular, direccion,rol,fecha_registro } = req.body;        
+        let status = await Usuario.registrapersona(cedula,nombres, apellidos, correo, password,direccion, fecha_naci, celular,rol,especialidad,fecha_registro);
         if (status === 1)
             res.json({ mensaje: "Registro correcto", estado: "1" });
         else if(status === 2)
@@ -64,7 +64,6 @@ user.iniciarSesion = async (req, res) => {
         if (usuario.length > 0 && clave.length > 0) {
             //var encrypted = AES.encrypt(clave, 'secret key11').toString();
             //console.log(encrypted);
-            console.log(req.headers);
             let datos = await Usuario.inciarSesion(usuario, clave);
             if (datos !== 0 && datos !== null) {
                 res.json({ mensaje: "Sesion iniciada", estado: "1" });

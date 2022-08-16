@@ -33,13 +33,23 @@ Usuario.listar_medicos = async () => {
 }
 
 //Se registra una nueva persona
-Usuario.registrapersona = async (cedula, nombres, apellidos, correo, password, fecha_naci, genero, direccion, ciudad,celular, tipo_sangre,discapacidad,rol,estado) => {
+Usuario.registrapersona = async (cedula,nombres, apellidos, correo, password,direccion, fecha_naci, celular,rol,especialidad,fecha_registro) => {
     try {
-        
-        let datos = await pool.query("INSERT INTO persona("+
-            "cedula, nombres, apellidos, correo, password, fecha_naci, genero, direccion, ciudad, celular, tipo_sangre, discapacidad, rol,estado)"+
-            "VALUES ('"+cedula+"', '"+nombres+"', '"+apellidos+"', '"+correo+"', '"+password+"', '"+fecha_naci+"', '"+genero+"', '"+direccion+"', '"+ciudad+"', '"+celular+"', '"+tipo_sangre+"', '"+discapacidad+"', '"+rol+"','"+estado+"');");
-        console.log(datos);
+        console.log(celular);
+        if(rol =='MEDICO'){
+            console.log(especialidad);
+            let datos = await pool.query("INSERT INTO persona("+
+            "cedula, nombres, apellidos, correo, password, fecha_naci, direccion, celular, rol,estado)"+
+            "VALUES ('"+cedula+"', '"+nombres+"', '"+apellidos+"', '"+correo+"', '"+password+"', '"+fecha_naci+"', '"+direccion+"','"+celular+"', 'MEDICO','PENDIENTE');");
+            datos = await pool.query("select max(id) as id from persona");
+            let id=datos.rows[0].id;
+            console.log(id,especialidad,fecha_registro);
+            datos=await pool.query("INSERT INTO medico(id_persona, especialidad,fecha_registro) VALUES ("+id+", '"+especialidad+"', '"+fecha_registro+"');");
+        }else if(rol=='PACIENTE'){
+            let datos = await pool.query("INSERT INTO persona("+
+            "cedula, nombres, apellidos, correo, password, fecha_naci, direccion, celular, rol,estado)"+
+            "VALUES ('"+cedula+"', '"+nombres+"', '"+apellidos+"', '"+correo+"', '"+password+"', '"+fecha_naci+"', '"+direccion+"', '"+celular+"', 'PACIENTE','ACTIVO');");
+        }
         return 1;
     } catch (error) {
         if(error.constraint=="ced_u"){
