@@ -66,7 +66,7 @@ user.iniciarSesion = async (req, res) => {
             //console.log(encrypted);
             let datos = await Usuario.inciarSesion(usuario, clave);
             if (datos !== 0 && datos !== null) {
-                res.json({ mensaje: "Sesion iniciada", estado: "1" });
+                res.json({ mensaje: "Sesion iniciada", estado: datos.rows[0].rol, cedula:datos.rows[0].cedula });
             }
             else
                 res.json({ mensaje: "Ingreso fallido", estado: "0" });
@@ -80,7 +80,61 @@ user.iniciarSesion = async (req, res) => {
     }
 }
 
+//Se obtiene los datos del usuario 
+user.getUsuario = async (req, res) => {
+    try {
+        console.log(req.params);
+        const { cedula } = req.params;
+        console.log(cedula);
+        if (cedula != null) {
+            let datos = await Usuario.getUser(cedula);
+            if (datos != null) {
+                datos.estado = "1";
+                res.json(datos);
+            }
+            else
+                res.json({ estado: "0" });
+        }
+        else
+            res.json({ estado: "0" });
+    }
+    catch (error) {
+        console.error();
+        res.json({ estado: 0 });
+    }
+}
 
+//Se obtiene los datos del usuario 
+user.obtener_nombres_medicos = async (req, res) => {
+    try {
+        const { especialidad } = req.body;
+        let datos = await Usuario.obtener_nombres_medicos(especialidad);
+        if (datos != null) {
+            datos.estado = "1";
+            res.json(datos);
+        }
+        else
+            res.json({ estado: "0" });
+    }
+    catch (error) {
+        console.error();
+        res.json({ estado: 0 });
+    }
+}
+
+user.nueva_citayturno = async (req, res) => {
+    try {
+        const { hora_empieza, hora_termina, fecha, id_medico,id_paciente } = req.body;        
+        let status = await Usuario.registra_turnoycita(hora_empieza, hora_termina, fecha, id_medico,id_paciente);
+        if (status === 1)
+            res.json({ mensaje: "Registro correcto", estado: "1" });
+        else
+            res.json({ mensaje: "No registro", estado: "0" });
+    }
+    catch (error) {
+        res.json({ mensaje: "El sistema falló",estado: 0 });
+    }
+}
 ////////////////////////////
 
 ////////////////////////////
@@ -129,29 +183,6 @@ user.solicitudespendientes = async (req, res) => {
         res.json(datos);
     } catch (error) {
         console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
-//Se obtiene los datos del usuario 
-user.getUsuario = async (req, res) => {
-    try {
-        const { usuario } = req.params;
-        console.log(usuario);
-        if (usuario != null) {
-            let datos = await Usuario.getUser(usuario);
-            if (datos != null) {
-                datos.estado = "1";
-                res.json(datos);
-            }
-            else
-                res.json({ estado: "0" });
-        }
-        else
-            res.json({ estado: "0" });
-    }
-    catch (error) {
-        console.error();
         res.json({ estado: 0 });
     }
 }

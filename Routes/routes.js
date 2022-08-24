@@ -10,13 +10,16 @@ router.post("/admin/usuarios/medicos", user.listar_medicos);
 //PERSONAS
 router.post("/usuarios/registro", user.nuevapersona);
 router.post("/iniciar_sesion", user.iniciarSesion);
+router.get("/paciente/datos/:cedula", user.getUsuario);
+router.post("/medicos/nombres", user.obtener_nombres_medicos);
 
+//CITAS Y TURNOS
+router.post("/citas/registro", user.nueva_citayturno);
 
 
 
 //usuarios
 router.post("/usuario/nuevo", user.nuevoUsuario);
-router.get("/usuario/datos/:usuario", user.getUsuario);
 router.post("/usuario/modificar", user.modificarUsuario);
 router.post("/usuario/solicitud", user.enviar_solicitud);
 router.post("/usuario/aceptar", user.acepta_solicitud);

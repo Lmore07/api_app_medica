@@ -40,10 +40,9 @@ Usuario.registrapersona = async (cedula,nombres, apellidos, correo, password,dir
             console.log(especialidad);
             let datos = await pool.query("INSERT INTO persona("+
             "cedula, nombres, apellidos, correo, password, fecha_naci, direccion, celular, rol,estado)"+
-            "VALUES ('"+cedula+"', '"+nombres+"', '"+apellidos+"', '"+correo+"', '"+password+"', '"+fecha_naci+"', '"+direccion+"','"+celular+"', 'MEDICO','PENDIENTE');");
+            "VALUES ('"+cedula+"', '"+nombres+"', '"+apellidos+"', '"+correo+"', '"+password+"', '"+fecha_naci+"', '"+direccion+"','"+celular+"', 'MEDICO','ACTIVO');");
             datos = await pool.query("select max(id) as id from persona");
             let id=datos.rows[0].id;
-            console.log(id,especialidad,fecha_registro);
             datos=await pool.query("INSERT INTO medico(id_persona, especialidad,fecha_registro) VALUES ("+id+", '"+especialidad+"', '"+fecha_registro+"');");
         }else if(rol=='PACIENTE'){
             let datos = await pool.query("INSERT INTO persona("+
@@ -99,14 +98,59 @@ Usuario.valida_cedula = async (cedula) => {
 //INICIO DE SESION
 Usuario.inciarSesion = async (usuario, clave) => {
     try {
-        let datos = await pool.query("select password from persona where correo='"+usuario+"'");
+        let datos = await pool.query("select password, rol, cedula from persona where correo='"+usuario+"'");
         if(clave==datos.rows[0].password){
-            return 1;
+            return datos;
         }else{
             return 0;
         }
     } catch (error) {
         console.log(error);
+        return 0;
+    }
+}
+
+
+//Llama a la función para obtener los datos de 1 usuario
+Usuario.getUser = async (cedula) => {
+    try {
+        console.log(cedula);
+        let datos = await pool.query("select nombres,apellidos, cedula, date_part('year',AGE(CURRENT_DATE, fecha_naci)) as edad from persona where cedula='"+cedula+"';");
+        if (datos.rowCount > 0)
+            return datos.rows[0];
+        else
+            return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+//Llama a la función para obtener los nombres de todos los medicos
+Usuario.obtener_nombres_medicos = async (especialidad) => {
+    try {
+        let datos = await pool.query("select nombres||' '||apellidos as nombres, id_medico from medico M inner join persona P on M.id_persona=P.id where especialidad='"+especialidad+"'");
+        if (datos.rowCount > 0)
+            return datos.rows;
+        else
+            return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+//Se registra una nueva persona
+Usuario.registra_turnoycita = async (hora_empieza, hora_termina, fecha, id_medico,id_paciente) => {
+    try {
+        console.log(celular);
+        
+            let datos = await pool.query("INSERT INTO turnos(fecha, id_medico,hora_empieza, hora_termina) VALUES ('"+fecha+"', '"+id_medico+"', '"+hora_empieza+"', '"+hora_termina+"');");
+            datos = await pool.query("select max(id_turno) as id from turnos");
+            let id=datos.rows[0].id;
+            datos= await pool.query("INSERT INTO citas(id_paciente, id_turno, estado) VALUES ("+id_paciente+","+id+" , 'PENDIENTE');");        
+            return 1;
+    } catch (error) {
         return 0;
     }
 }
@@ -218,21 +262,6 @@ Usuario.solicitudespendientes = async (usuario) => {
             aux.push(element.obtener_solicitudes_pendientes);
         });
         return aux;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-//Llama a la función para obtener los datos de 1 usuario
-Usuario.getUser = async (usuario) => {
-    try {
-
-        let datos = await pool.query("select obtener_usuario($1)", [usuario]);
-        if (datos.rowCount > 0)
-            return datos.rows[0].obtener_usuario;
-        else
-            return null;
     } catch (error) {
         console.log(error);
         return null;
