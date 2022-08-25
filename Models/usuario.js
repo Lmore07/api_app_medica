@@ -40,7 +40,7 @@ Usuario.registrapersona = async (cedula,nombres, apellidos, correo, password,dir
             console.log(especialidad);
             let datos = await pool.query("INSERT INTO persona("+
             "cedula, nombres, apellidos, correo, password, fecha_naci, direccion, celular, rol,estado)"+
-            "VALUES ('"+cedula+"', '"+nombres+"', '"+apellidos+"', '"+correo+"', '"+password+"', '"+fecha_naci+"', '"+direccion+"','"+celular+"', 'MEDICO','ACTIVO');");
+            "VALUES ('"+cedula+"', '"+nombres+"', '"+apellidos+"', '"+correo+"', '"+password+"', '"+fecha_naci+"', '"+direccion+"','"+celular+"', 'MEDICO','PENDIENTE');");
             datos = await pool.query("select max(id) as id from persona");
             let id=datos.rows[0].id;
             datos=await pool.query("INSERT INTO medico(id_persona, especialidad,fecha_registro) VALUES ("+id+", '"+especialidad+"', '"+fecha_registro+"');");
@@ -98,7 +98,7 @@ Usuario.valida_cedula = async (cedula) => {
 //INICIO DE SESION
 Usuario.inciarSesion = async (usuario, clave) => {
     try {
-        let datos = await pool.query("select password, rol, cedula, id from persona where correo='"+usuario+"'");
+        let datos = await pool.query("select password, rol, cedula,id from persona where correo='"+usuario+"'");
         if(clave==datos.rows[0].password){
             return datos;
         }else{
@@ -143,7 +143,6 @@ Usuario.obtener_nombres_medicos = async (especialidad) => {
 //Se registra una nueva persona
 Usuario.registra_turnoycita = async (hora_empieza, hora_termina, fecha, id_medico,id_paciente) => {
     try {
-            console.log(hora_empieza, hora_termina, fecha, id_medico,id_paciente);        
             let datos = await pool.query("INSERT INTO turnos(fecha, id_medico,hora_empieza, hora_termina) VALUES ('"+fecha+"', '"+id_medico+"', '"+hora_empieza+"', '"+hora_termina+"');");
             datos = await pool.query("select max(id_turno) as id from turnos");
             let id=datos.rows[0].id;

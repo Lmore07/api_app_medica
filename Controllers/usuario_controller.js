@@ -65,7 +65,7 @@ user.iniciarSesion = async (req, res) => {
             //console.log(encrypted);
             let datos = await Usuario.inciarSesion(usuario, clave);
             if (datos !== 0 && datos !== null) {
-                res.json({ mensaje: "Sesion iniciada", estado: datos.rows[0].rol, cedula:datos.rows[0].cedula,id:datos.rows[0].id });
+                res.json({ mensaje: "Sesion iniciada", estado: datos.rows[0].rol, cedula:datos.rows[0].cedula, id:datos.rows[0].id});
             }
             else
                 res.json({ mensaje: "Ingreso fallido", estado: "0" });
@@ -123,7 +123,7 @@ user.obtener_nombres_medicos = async (req, res) => {
 
 user.nueva_citayturno = async (req, res) => {
     try {
-        const { hora_empieza, hora_termina, fecha, id_medico,id_paciente } = req.body;        
+        const { hora_empieza, hora_termina, fecha, id_medico,id_paciente } = req.body; 
         let status = await Usuario.registra_turnoycita(hora_empieza, hora_termina, fecha, id_medico,id_paciente);
         if (status === 1)
             res.json({ mensaje: "Registro correcto", estado: "1" });
