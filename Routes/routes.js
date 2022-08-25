@@ -15,7 +15,8 @@ router.post("/medicos/nombres", user.obtener_nombres_medicos);
 
 //CITAS Y TURNOS
 router.post("/citas/registro", user.nueva_citayturno);
-
+router.get("/paciente/citas/:paciente", user.obtener_citas_paciente);
+router.delete('/citas/eliminar/:cita', user.elimiar_citas);
 
 
 //usuarios

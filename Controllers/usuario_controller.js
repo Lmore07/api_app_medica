@@ -37,7 +37,6 @@ user.listar_medicos = async (req, res) => {
     }
 }
 
-
 //se agrega una nueva persona
 user.nuevapersona = async (req, res) => {
     try {
@@ -66,7 +65,7 @@ user.iniciarSesion = async (req, res) => {
             //console.log(encrypted);
             let datos = await Usuario.inciarSesion(usuario, clave);
             if (datos !== 0 && datos !== null) {
-                res.json({ mensaje: "Sesion iniciada", estado: datos.rows[0].rol, cedula:datos.rows[0].cedula });
+                res.json({ mensaje: "Sesion iniciada", estado: datos.rows[0].rol, cedula:datos.rows[0].cedula,id:datos.rows[0].id });
             }
             else
                 res.json({ mensaje: "Ingreso fallido", estado: "0" });
@@ -135,6 +134,43 @@ user.nueva_citayturno = async (req, res) => {
         res.json({ mensaje: "El sistema falló",estado: 0 });
     }
 }
+
+//Se obtienen las citas de un determinado paciente
+user.obtener_citas_paciente = async (req, res) => {
+    try {
+        const { paciente } = req.params;
+        console.log(paciente);
+        let datos = await Usuario.obtener_citas_paciente(paciente);
+        if (datos != null) {
+            datos.estado = "1";
+            res.json(datos);
+        }
+        else
+            res.json({ estado: "0" });
+    }
+    catch (error) {
+        console.error();
+        res.json({ estado: 0 });
+    }
+}
+
+user.elimiar_citas = async (req, res) => {
+    try {
+        const {cita} = req.params;
+        console.log(req.params);
+        console.log(cita);
+        let status = await Usuario.eliminar_citas(cita);
+            if (status === 1) {
+                res.json({ mensaje: "Eliminado con éxito ", estado: "1" });
+            }
+            else
+                res.json({ mensaje: "Eliminación fallido ", estado: "0" });
+    } catch (error) {
+        console.log(error);
+        res.json({ estado: 0 });
+    }
+}
+
 ////////////////////////////
 
 ////////////////////////////
