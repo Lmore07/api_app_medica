@@ -82,9 +82,7 @@ user.iniciarSesion = async (req, res) => {
 //Se obtiene los datos del usuario 
 user.getUsuario = async (req, res) => {
     try {
-        console.log(req.params);
         const { cedula } = req.params;
-        console.log(cedula);
         if (cedula != null) {
             let datos = await Usuario.getUser(cedula);
             if (datos != null) {
@@ -102,6 +100,60 @@ user.getUsuario = async (req, res) => {
         res.json({ estado: 0 });
     }
 }
+
+//ver perfil
+user.ver_perfil_user = async (req, res) => {
+    try {
+        const { cedula } = req.params;
+        console.log(cedula);
+        if (cedula != null) {
+            let datos = await Usuario.ver_perfil(cedula);
+            if (datos != null) {
+                datos.estado = "1";
+                res.json(datos);
+            }
+            else
+                res.json({ estado: "0" });
+        }
+        else
+            res.json({ estado: "0" });
+    }
+    catch (error) {
+        console.error();
+        res.json({ estado: 0 });
+    }
+}
+
+user.actualizar_informacion_personal = async (req, res) => {
+    try {
+        const { id, cedula,nombres, apellidos, direccion, fecha_naci, celular,especialidad,rol } = req.body;        
+        let status = await Usuario.actualizar_datos(id, cedula,nombres, apellidos, direccion, fecha_naci, celular,especialidad,rol);
+        if (status === 1)
+            res.json({ mensaje: "Actualizacion Completa", estado: "1" });
+        else if(status === 2)
+            res.json({ mensaje: "Cedula repetida", estado: "2" });
+        else if(status === 3)
+            res.json({ mensaje: "Celular repetida", estado: "3" });
+        else if(status === 4)
+            res.json({ mensaje: "Correo repetido", estado: "4" });
+    }
+    catch (error) {
+        res.json({ mensaje: "El sistema falló",estado: 0 });
+    }
+}
+
+user.aprobar_medico = async (req, res) => {
+    try {
+        console.log(req.body)
+        const { id } = req.body;        
+        let status = await Usuario.aprobar_medico(id);
+            res.json({ mensaje: "Médico Aprobado", estado: "1" });
+    }
+    catch (error) {
+        res.json({ mensaje: "El sistema falló",estado: 0 });
+    }
+}
+
 
 //Se obtiene los datos del usuario 
 user.obtener_nombres_medicos = async (req, res) => {
@@ -121,50 +173,30 @@ user.obtener_nombres_medicos = async (req, res) => {
     }
 }
 
-user.nueva_citayturno = async (req, res) => {
+user.eliminar_medicos = async (req, res) => {
     try {
-        const { hora_empieza, hora_termina, fecha, id_medico,id_paciente } = req.body; 
-        let status = await Usuario.registra_turnoycita(hora_empieza, hora_termina, fecha, id_medico,id_paciente);
-        if (status === 1)
-            res.json({ mensaje: "Registro correcto", estado: "1" });
-        else
-            res.json({ mensaje: "No registro", estado: "0" });
-    }
-    catch (error) {
-        res.json({ mensaje: "El sistema falló",estado: 0 });
-    }
-}
-
-//Se obtienen las citas de un determinado paciente
-user.obtener_citas_paciente = async (req, res) => {
-    try {
-        const { paciente } = req.params;
-        console.log(paciente);
-        let datos = await Usuario.obtener_citas_paciente(paciente);
-        if (datos != null) {
-            datos.estado = "1";
-            res.json(datos);
-        }
-        else
-            res.json({ estado: "0" });
-    }
-    catch (error) {
-        console.error();
+        const {id} = req.params;
+        let status = await Usuario.eliminar_medicos(id);
+            if (status === 1) {
+                res.json({ mensaje: "Eliminado con éxito", estado: "1" });
+            }
+            else
+                res.json({ mensaje: "Eliminación fallida", estado: "0" });
+    } catch (error) {
+        console.log(error);
         res.json({ estado: 0 });
     }
 }
 
-user.elimiar_citas = async (req, res) => {
+user.eliminar_pacientes = async (req, res) => {
     try {
-        const {cita} = req.params;
-        console.log(req.params);
-        console.log(cita);
-        let status = await Usuario.eliminar_citas(cita);
+        const {id} = req.params;
+        let status = await Usuario.eliminar_pacientes(id);
             if (status === 1) {
-                res.json({ mensaje: "Eliminado con éxito ", estado: "1" });
+                res.json({ mensaje: "Eliminado con éxito", estado: "1" });
             }
             else
-                res.json({ mensaje: "Eliminación fallido ", estado: "0" });
+                res.json({ mensaje: "Eliminación fallida", estado: "0" });
     } catch (error) {
         console.log(error);
         res.json({ estado: 0 });
@@ -174,263 +206,4 @@ user.elimiar_citas = async (req, res) => {
 ////////////////////////////
 
 ////////////////////////////
-
-
-user.listarUsuariosp = async (req, res) => {
-    try {
-        const { usuario } = req.body;
-        const datos = await Usuario.listarUsuariosp(usuario);
-        res.json(datos);
-    } catch (error) {
-        console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
-//mostrar amigos
-user.mostraramigos = async (req, res) => {
-    try {
-        const { usuario } = req.params;
-        const datos = await Usuario.mostraramigos(usuario);
-        res.json(datos);
-    } catch (error) {
-        console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
-//obtener solicitudes
-user.solicitudes = async (req, res) => {
-    try {
-        const { usuario } = req.params;
-        const datos = await Usuario.solicitudes(usuario);
-        res.json(datos);
-    } catch (error) {
-        console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
-//obtener solicitudes
-user.solicitudespendientes = async (req, res) => {
-    try {
-        const { usuario } = req.params;
-        const datos = await Usuario.solicitudespendientes(usuario);
-        res.json(datos);
-    } catch (error) {
-        console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
-//Se obtiene los amigos del usuario 
-user.numamigos = async (req, res) => {
-    try {
-        const { usuario } = req.params;
-        console.log(usuario);
-        if (usuario != null) {
-            let datos = await Usuario.numamigos(usuario);
-            if (datos != null) {
-                datos.estado = "1";
-                res.json(datos);
-            }
-            else
-                res.json({ estado: "0" });
-        }
-        else
-            res.json({ estado: "0" });
-    }
-    catch (error) {
-        console.error();
-        res.json({ estado: 0 });
-    }
-}
-
-//Se verifica que los datos no estén vacios y 
-//se obtienen una verificación de que son correctos
-
-
-
-//cierra sesion
-user.cierrasesion = async (req, res) => {
-    try {
-        const { usuario } = req.body;
-        if (usuario.length > 0) {
-            let datos = await Usuario.cierrasesion(usuario);
-            if (datos !== 0 && datos !== null) {
-                res.json({ mensaje: "Sesion cerrada", estado: "1" });
-            }
-            else
-                res.json({ mensaje: "Salida fallida", estado: "0" });
-        }
-        else
-            res.json({ mensaje: "campos vacios", estado: "0" });
-    }
-    catch (error) {
-        console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
-//Se obtienen todos los datos y luego se reemplaza con los valores actuales
-user.modificarUsuario = async (req, res) => {
-    try {
-        const { usuario } = req.body;
-        if (usuario != null) {
-            let foto_perfil = "";
-            if (req.files.length == 0) {
-                let datos = await Usuario.getUser(usuario);
-                foto_perfil = datos.foto_perfil;
-            } else {
-                foto_perfil = (await cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
-            }
-            console.log("aqui va ruta");
-            console.log(req.files[0].path);
-            console.log("aqui va ruta");
-            const { nombres, correo,
-                pais, ciudad, estado, sobremi, hobbies, celular } = req.body;
-
-            let status = await Usuario.modificarUser(nombres, usuario, correo, foto_perfil,
-                pais, ciudad, estado, sobremi, hobbies, celular);
-            //console.log(status);
-            if (status === 1)
-                res.json({ mensaje: "Modificado con exito", estado: "1" });
-            else
-                res.json({ mensaje: "Modificación fallida ", estado: "0" });
-        }
-        else
-            res.json({ mensaje: "El usuario no ha iniciado la sesión ", estado: "0" });
-    } catch (error) {
-        res.json({ mensaje: "Error: " + error, estado: "0" });
-    }
-}
-
-//se hace una solicitud
-user.enviar_solicitud = async (req, res) => {
-    try {
-        const { usuario1, usuario2 } = req.body;
-        if (usuario1 != null) {
-            let status = await Usuario.enviar_solicitud(usuario1, usuario2);
-            console.log(status);
-            if (status === 1)
-                res.json({ mensaje: "ENVIADO con exito", estado: "1" });
-            else
-                res.json({ mensaje: "SOLICITUD fallida ", estado: "0" });
-        }
-        else
-            res.json({ mensaje: "No se realizo la solicitud ", estado: "0" });
-    } catch (error) {
-        res.json({ mensaje: "Error: " + error, estado: "0" });
-    }
-}
-
-//se acepta solicitud
-user.acepta_solicitud = async (req, res) => {
-    try {
-        const { usuario1, usuario2 } = req.body;
-        if (usuario1 != null) {
-            let status = await Usuario.aceptar_solicitud(usuario1, usuario2);
-            console.log(status);
-            if (status === 1)
-                res.json({ mensaje: "ENVIADO con exito", estado: "1" });
-            else
-                res.json({ mensaje: "SOLICITUD fallida ", estado: "0" });
-        }
-        else
-            res.json({ mensaje: "No se realizo la solicitud ", estado: "0" });
-    } catch (error) {
-        res.json({ mensaje: "Error: " + error, estado: "0" });
-    }
-}
-
-//Se registra un nuevo usuario
-user.nuevoUsuario = async (req, res) => {
-    try {
-        const { usuario, nombres, correo, clave } = req.body;
-        let foto_perfil = "";
-        foto_perfil = (await cloudinary.v2.uploader.upload(req.files[0].path)).secure_url.trim();
-        let status = await Usuario.registrarUser(usuario, nombres, correo, clave, foto_perfil);
-        console.log(status);
-        if (req.files != undefined) {
-            req.files.forEach(async element => {
-                await fs.unlink(element.path);
-            });
-        }
-        if (status === 1)
-            res.json({ mensaje: "Registro correcto", estado: "1" });
-        else
-            res.json({ mensaje: "Registro fallido", estado: "0" });
-    }
-    catch (error) {
-        console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
-//Se elimina un usuario
-user.elimnarUsuario = async (req, res) => {
-    try {
-        const usuario = req.params.usuario;
-        if (usuario != null) {
-            let status = await Usuario.eliminarUser(usuario);
-            if (status === 1) {
-                res.json({ mensaje: "Eliminado con éxito ", estado: "1" });
-            }
-            else
-                res.json({ mensaje: "Eliminación fallido ", estado: "0" });
-
-        }
-        else
-            res.json({ mensaje: "El sesión no está iniciada", estado: "0" });
-    } catch (error) {
-        console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
-/////
-
-user.modificarpersona = async (req, res) => {
-    try {
-        const { cedula, apellidos, nombres, id_tipo, id_especialidad, celular, mail, fecha, genero, ocupacion, tipo_sangre, 
-            ciudad } = req.body;
-            let status = await Usuario.modificarpersona(cedula, apellidos, nombres, id_tipo, id_especialidad, celular, mail, fecha, genero, ocupacion, tipo_sangre, 
-                ciudad);
-            //console.log(status);
-            if (status === 1)
-                res.json({ mensaje: "Modificado con exito", estado: "1" });
-            else
-                res.json({ mensaje: "Modificación fallida ", estado: "0" });
-    } catch (error) {
-        res.json({ mensaje: "Error: " + error, estado: "0" });
-    }
-}
-
-//Se elimina un usuario
-user.eliminpersona = async (req, res) => {
-    try {
-        const {cedula} = req.body;
-        console.log(req.body);
-        let status = await Usuario.eliminarpersona(cedula);
-            if (status === 1) {
-                res.json({ mensaje: "Eliminado con éxito ", estado: "1" });
-            }
-            else
-                res.json({ mensaje: "Eliminación fallido ", estado: "0" });
-    } catch (error) {
-        console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
-user.listarpersonas = async (req, res) => {
-    try {
-        const datos = await Usuario.listarpersonas();
-        res.json(datos);
-    } catch (error) {
-        console.log(error);
-        res.json({ estado: 0 });
-    }
-}
-
 module.exports = { user };

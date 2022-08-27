@@ -1,47 +1,29 @@
 const { Router } = require("express");
-const chat = require("../Controllers/chat_controller");
 const { user } = require("../Controllers/usuario_controller");
+const { cita } = require("../Controllers/citas_controller");
+
 const router = Router();
 
 // Admin
 router.get("/admin/usuarios/pacientes", user.listar_pacientes);
-router.post("/admin/usuarios/medicos", user.listar_medicos);
+router.get("/admin/usuarios/medicos", user.listar_medicos);
+router.delete('/medicos/eliminar/:id', user.eliminar_medicos);
+router.delete('/pacientes/eliminar/:id', user.eliminar_pacientes);
+router.post("/admin/aprobar", user.aprobar_medico);
+
 
 //PERSONAS
 router.post("/usuarios/registro", user.nuevapersona);
 router.post("/iniciar_sesion", user.iniciarSesion);
 router.get("/paciente/datos/:cedula", user.getUsuario);
 router.post("/medicos/nombres", user.obtener_nombres_medicos);
+router.get("/perfil/datos/:cedula", user.ver_perfil_user);
+router.post("/usuarios/actualizacion", user.actualizar_informacion_personal);
 
 //CITAS Y TURNOS
-router.post("/citas/registro", user.nueva_citayturno);
-router.get("/paciente/citas/:paciente", user.obtener_citas_paciente);
-router.delete('/citas/eliminar/:cita', user.elimiar_citas);
-
-
-//usuarios
-router.post("/usuario/nuevo", user.nuevoUsuario);
-router.post("/usuario/modificar", user.modificarUsuario);
-router.post("/usuario/solicitud", user.enviar_solicitud);
-router.post("/usuario/aceptar", user.acepta_solicitud);
-router.get("/usuario/amigos/:usuario", user.mostraramigos);
-router.get("/usuario/amigosnum/:usuario", user.numamigos);
-router.get("/usuario/solicitudes/:usuario", user.solicitudes);
-router.get("/usuario/solicitudespendientes/:usuario", user.solicitudespendientes);
-
-//personas
-router.post("/personas/nuevo", user.nuevapersona);
-router.get("/personas/listar", user.listarpersonas);
-router.post("/personas/borrar", user.eliminpersona);
-router.post("/personas/modificar", user.modificarpersona);
-
-router.post("/cerrar_sesion", user.cierrasesion);
-
-router.delete('/usuario/eliminar/:usuario', user.elimnarUsuario);
-
-// Foro - chat
-router.post("/chat/nuevo", chat.nuevoMensaje);
-router.post("/chat/obtener", chat.obtenerMensajes);
+router.post("/citas/registro", cita.nueva_citayturno);
+router.get("/paciente/citas/:paciente", cita.obtener_citas_paciente);
+router.delete('/citas/eliminar/:cita', cita.eliminar_citas);
 
 
 module.exports = router;

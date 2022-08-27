@@ -5,12 +5,12 @@ const Usuario = {}
 //Devuelve todos los usuarios pacientes registrados
 Usuario.listar_pacientes = async () => {
     try {
-        let aux = [];
-        let datos = await pool.query("select * from persona where rol='Paciente'");
-        datos.rows.forEach(element => {
-            aux.push(element);
-        });
-        return aux;
+        let datos = await pool.query("select id, cedula, nombres, apellidos,direccion,celular,correo from persona "+
+        "where rol='PACIENTE'");
+        if (datos.rowCount > 0)
+            return datos.rows;
+        else
+            return null;
     } catch (error) {
         console.log(error);
         return null;
@@ -20,12 +20,14 @@ Usuario.listar_pacientes = async () => {
 //Devuelve todos los usuarios medicos registrados
 Usuario.listar_medicos = async () => {
     try {
-        let aux = [];
-        let datos = await pool.query("select * from persona where rol='Medico'");
-        datos.rows.forEach(element => {
-            aux.push(element);
-        });
-        return aux;
+        let datos = await pool.query("select P.id, cedula, nombres, apellidos,especialidad,direccion,celular,correo,estado from medico M inner join "+
+        "persona P on M.id_persona=P.id");
+        if (datos.rowCount > 0)
+        {
+            return datos.rows;
+        }
+        else
+            return null;
     } catch (error) {
         console.log(error);
         return null;
@@ -110,7 +112,6 @@ Usuario.inciarSesion = async (usuario, clave) => {
     }
 }
 
-
 //Llama a la función para obtener los datos de 1 usuario
 Usuario.getUser = async (cedula) => {
     try {
@@ -129,7 +130,7 @@ Usuario.getUser = async (cedula) => {
 //Llama a la función para obtener los nombres de todos los medicos
 Usuario.obtener_nombres_medicos = async (especialidad) => {
     try {
-        let datos = await pool.query("select nombres||' '||apellidos as nombres, id_medico from medico M inner join persona P on M.id_persona=P.id where especialidad='"+especialidad+"'");
+        let datos = await pool.query("select nombres||' '||apellidos as nombres, id_medico from medico M inner join persona P on M.id_persona=P.id where especialidad='"+especialidad+"' and estado='ACTIVO'");
         if (datos.rowCount > 0)
             return datos.rows;
         else
@@ -140,262 +141,87 @@ Usuario.obtener_nombres_medicos = async (especialidad) => {
     }
 }
 
-//Se registra una nueva persona
-Usuario.registra_turnoycita = async (hora_empieza, hora_termina, fecha, id_medico,id_paciente) => {
+Usuario.ver_perfil = async (cedula) => {
     try {
-            let datos = await pool.query("INSERT INTO turnos(fecha, id_medico,hora_empieza, hora_termina) VALUES ('"+fecha+"', '"+id_medico+"', '"+hora_empieza+"', '"+hora_termina+"');");
-            datos = await pool.query("select max(id_turno) as id from turnos");
-            let id=datos.rows[0].id;
-            datos= await pool.query("INSERT INTO citas(id_paciente, id_turno, estado) VALUES ("+id_paciente+","+id+" , 'PENDIENTE');");        
-            return 1;
+        let datos = await pool.query("select cedula,nombres,apellidos,direccion,celular,fecha_naci,especialidad from persona P left join medico M "+
+        "on P.id=M.id_persona "+
+        "where cedula='"+cedula+"'");
+        if (datos.rowCount > 0)
+            return datos.rows[0];
+        else
+            return null;
     } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+//actualizar datos personales
+Usuario.actualizar_datos = async (id, cedula,nombres, apellidos, direccion, fecha_naci, celular,especialidad,rol) => {
+    try {
+        console.log(rol);
+        if(rol =='MEDICO'){
+            console.log(especialidad);
+            let datos = await pool.query("UPDATE public.persona "+
+            "SET cedula='"+cedula+"', nombres='"+nombres+"', apellidos='"+apellidos+"', fecha_naci='"+fecha_naci+"', direccion='"+direccion+"', celular='"+celular+"' "+
+            "WHERE cedula='"+cedula+"'");
+            datos=await pool.query("UPDATE public.medico "+
+            "SET especialidad='"+especialidad+"'"+
+            " WHERE id_persona="+id);
+        }else if(rol=='PACIENTE'){
+            let datos = await pool.query("UPDATE persona "+
+            "SET cedula='"+cedula+"', nombres='"+nombres+"', apellidos='"+apellidos+"', fecha_naci='"+fecha_naci+"', direccion='"+direccion+"', celular='"+celular+"' "+
+            "WHERE id="+id);
+            console.log(datos);
+        }
+        return 1;
+    } catch (error) {
+        if(error.constraint=="ced_u"){
+            return 2;
+        }else if(error.constraint=="celu_u"){
+            return 3;
+        }else if(error.constraint=="correo_u"){
+            return 4;
+        }
         return 0;
     }
 }
 
-//obtienes todos las citas de un paciente
-Usuario.obtener_citas_paciente = async (paciente) => {
+Usuario.eliminar_pacientes = async (id) => {
     try {
-        let datos = await pool.query("select C.id_cita,T.id_turno,T.id_medico, hora_empieza,hora_termina,especialidad, nombres||' '||apellidos as medico,fecha, C.estado "+
-        "from citas C inner join turnos T on C.id_turno=T.id_turno "+
-        "inner join medico M on M.id_medico=T.id_medico inner join persona P "+
-        "on P.id=M.id_persona "+
-        "where id_paciente="+paciente+" order by fecha");
-        if (datos.rowCount > 0)
-            return datos.rows;
-        else
-            return null;
+        let datos = await pool.query("delete from persona where id="+id);
+        return 1;
     } catch (error) {
         console.log(error);
-        return null;
+        return 0;
     }
 }
 
-//Se envía el usuario que se va a eliminar
-Usuario.eliminar_citas = async (cita) => {
+Usuario.eliminar_medicos = async (id) => {
     try {
-        let datos = await pool.query("delete from turnos where id_turno="+cita);
-        return datos.rows[0].eliminar_usuario;
+        let datos = await pool.query("delete from medico where id_persona="+id);
+        datos = await pool.query("delete from persona where id="+id);
+        return 1;
     } catch (error) {
         console.log(error);
-        return null;
+        return 0;
+    }
+}
+
+//actualizar datos personales
+Usuario.aprobar_medico = async (id) => {
+    try {
+        console.log(id);
+        let datos = await pool.query("UPDATE persona "+
+            "SET estado='ACTIVO' "+
+            "WHERE id="+id);
+        return 1;
+    } catch (error) {
+        console.log(error);
+        return 0;
     }
 }
 
 ///////////////////////
-
-
-///////////////////////
-
-
-Usuario.listarUsuariosp = async (usuario) => {
-    try {
-        let aux = [];
-        console.log(usuario);
-        let datos = await pool.query("select listar_usuarios($1)",[usuario]);
-        console.log(datos);
-        datos.rows.forEach(element => {
-            aux.push(element.listar_usuarios);
-        });
-        return aux;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-//enviar solicitud
-Usuario.enviar_solicitud = async (usuario1, usuario2) => {
-    try {
-        let datos = await pool.query("select enviar_solicitud($1,$2)",
-            [usuario1, usuario2]);
-        return datos.rows[0].enviar_solicitud;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-//qceptar solicitud
-Usuario.aceptar_solicitud = async (usuario1, usuario2) => {
-    try {
-        let datos = await pool.query("select aceptar_solicitud($1,$2)",
-            [usuario1, usuario2]);
-        return datos.rows[0].aceptar_solicitud;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-//mostrar amigos
-Usuario.mostraramigos = async (usuario) => {
-    try {
-        let aux = [];
-        console.log(usuario);
-        let datos = await pool.query("select mostrar_amigos($1)",[usuario]);
-        console.log(datos);
-        datos.rows.forEach(element => {
-            aux.push(element.mostrar_amigos);
-        });
-        return aux;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-//mostrar numero de amigos
-Usuario.numamigos = async (usuario) => {
-    try {
-        let aux = [];
-        console.log(usuario);
-        let datos = await pool.query("select numero_amigos($1)",[usuario]);
-        console.log(datos);
-        datos.rows.forEach(element => {
-            aux.push(element.numero_amigos);
-        });
-        return aux;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-//obtener solicitudes
-Usuario.solicitudes = async (usuario) => {
-    try {
-        let aux = [];
-        console.log(usuario);
-        let datos = await pool.query("select obtener_solicitudes($1)",[usuario]);
-        console.log(datos);
-        datos.rows.forEach(element => {
-            aux.push(element.obtener_solicitudes);
-        });
-        return aux;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-Usuario.solicitudespendientes = async (usuario) => {
-    try {
-        let aux = [];
-        console.log(usuario);
-        let datos = await pool.query("select obtener_solicitudes_pendientes($1)",[usuario]);
-        console.log(datos);
-        datos.rows.forEach(element => {
-            aux.push(element.obtener_solicitudes_pendientes);
-        });
-        return aux;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-//Se envian datos de inicio de sesión para su verificación
-
-
-//cierra sesion
-Usuario.cierrasesion = async (usuario) => {
-    try {
-        let datos = await pool.query("select cerrar_sesion($1)", [usuario]);
-        return datos.rows[0].cerrar_sesion;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-//Se envian los datos para hacer la actualización
-Usuario.modificarUser = async (nombres, usuario, correo, foto_perfil, 
-    pais, ciudad, estado, sobremi, hobbies, celular) => {
-    try {
-        console.log(nombres, usuario, correo, foto_perfil, 
-            pais, ciudad, estado, sobremi, hobbies, celular);
-        let datos = await pool.query("select modificar_usuario($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
-            [usuario, nombres ,sobremi, correo, foto_perfil, pais, ciudad, estado, hobbies, celular]);
-            console.log(datos.rows);
-        return datos.rows[0].modificar_usuario;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-//Se envian los datos para registrar un nuevo usuario
-Usuario.registrarUser = async (usuario, nombres, correo, clave, foto_perfil) => {
-    try {
-        let datos = await pool.query(
-            "select nuevo_usuario($1,$2,$3,$4,$5)",
-            [usuario, nombres, correo, clave, foto_perfil]);
-        return datos.rows[0].nuevo_usuario;
-    } catch (error) {
-        return null;
-    }
-}
-
-//Se envía el usuario que se va a eliminar
-Usuario.eliminarUser = async (usuario) => {
-    try {
-        let datos = await pool.query("select eliminar_usuario($1)", [usuario]);
-        return datos.rows[0].eliminar_usuario;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-Usuario.cambiarClave = async (usuario, clave_actual, clave_nuevo) =>{
-    try {
-        let datos = await pool.query("select cambiar_clave($1,$2,$3)", [usuario, clave_actual, clave_nuevo]);
-        console.log(datos.rows);
-        return datos.rows[0].cambiar_clave;
-    } catch (error) {
-        return null;
-    }
-}
-
-Usuario.modificarpersona = async (cedula, apellidos, nombres, id_tipo, id_especialidad, celular, mail, fecha, genero, ocupacion, tipo_sangre, 
-    ciudad) => {
-    try {
-            
-            let datos = await pool.query("select modificar_persona('"+cedula+"','"+apellidos+"','"+nombres+"',"+id_tipo+","+id_especialidad+",'"+celular+"','"+mail+"','"+fecha+"','"+genero+"','"+ocupacion+"','"+tipo_sangre+"','"+ciudad+"')");
-
-        return datos.rows[0].modificar_persona;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-Usuario.listarpersonas = async () => {
-    try {
-        let aux = [];
-        let datos = await pool.query("select listar_personas()");
-        datos.rows.forEach(element => {
-            aux.push(element.listar_personas);
-        });
-        return aux;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-
-
-//Se envía el usuario que se va a eliminar
-Usuario.eliminarpersona = async (cedula) => {
-    try {
-        let datos = await pool.query("select eliminar_persona($1)", [cedula]);
-        return datos.rows[0].eliminar_persona;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
 
 module.exports = Usuario;
