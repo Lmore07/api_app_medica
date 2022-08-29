@@ -154,7 +154,6 @@ user.aprobar_medico = async (req, res) => {
     }
 }
 
-
 //Se obtiene los datos del usuario 
 user.obtener_nombres_medicos = async (req, res) => {
     try {
@@ -203,6 +202,27 @@ user.eliminar_pacientes = async (req, res) => {
     }
 }
 
+//Se obtiene los datos del usuario 
+user.get_id_medico = async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (id != null) {
+            let datos = await Usuario.get_id_medico(id);
+            if (datos != null) {
+                datos.estado = "1";
+                res.json(datos);
+            }
+            else
+                res.json({ estado: "0" });
+        }
+        else
+            res.json({ estado: "0" });
+    }
+    catch (error) {
+        console.error();
+        res.json({ estado: 0 });
+    }
+}
 ////////////////////////////
 
 ////////////////////////////

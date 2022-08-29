@@ -1,5 +1,4 @@
 const Citas = require("../Models/citas");
-const cloudinary = require('cloudinary');
 require('dotenv').config();
 const fs = require('fs-extra');
 var AES = require("crypto-js/aes");
@@ -57,4 +56,22 @@ cita.eliminar_citas = async (req, res) => {
     }
 }
 
+//
+cita.obtener_citas_medico = async (req, res) => {
+    try {
+        const { id } = req.params;
+        let datos = await Citas.obtiene_citas_medico(id);
+        console.log(datos);
+        if (datos != null) {
+            datos.estado = "1";
+            res.json(datos);
+        }
+        else
+            res.json({ estado: "0" });
+    }
+    catch (error) {
+        console.error();
+        res.json({ estado: 0 });
+    }
+}
 module.exports = { cita };

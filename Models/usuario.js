@@ -222,6 +222,33 @@ Usuario.aprobar_medico = async (id) => {
     }
 }
 
+Usuario.get_id_medico = async (id) => {
+    try {
+        let datos = await pool.query("select id_medico from medico where id_persona="+id);
+        if (datos.rowCount > 0)
+            return datos.rows[0];
+        else
+            return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+//actualizar datos personales
+Usuario.actualiza_cita = async (id_paciente) => {
+    try {
+            let datos = await pool.query("UPDATE citas"+
+            " SET estado='ATENDIDO'"+
+            " WHERE id_paciente="+id_paciente);
+            
+        return 1;
+    } catch (error) {
+        return 0;
+    }
+}
+
+
 ///////////////////////
 
 module.exports = Usuario;

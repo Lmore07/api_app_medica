@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { user } = require("../Controllers/usuario_controller");
 const { cita } = require("../Controllers/citas_controller");
+const { diagnostico } = require("../Controllers/diagnostico_controller");
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.post("/admin/aprobar", user.aprobar_medico);
 router.post("/usuarios/registro", user.nuevapersona);
 router.post("/iniciar_sesion", user.iniciarSesion);
 router.get("/paciente/datos/:cedula", user.getUsuario);
+router.get("/medico/:id", user.get_id_medico);
 router.post("/medicos/nombres", user.obtener_nombres_medicos);
 router.get("/perfil/datos/:cedula", user.ver_perfil_user);
 router.post("/usuarios/actualizacion", user.actualizar_informacion_personal);
@@ -24,6 +26,10 @@ router.post("/usuarios/actualizacion", user.actualizar_informacion_personal);
 router.post("/citas/registro", cita.nueva_citayturno);
 router.get("/paciente/citas/:paciente", cita.obtener_citas_paciente);
 router.delete('/citas/eliminar/:cita', cita.eliminar_citas);
+router.get("/medico/citas/:id", cita.obtener_citas_medico);
+
+//diagnostico
+router.post("/diagnostico/registro", diagnostico.nuevo_diagnostico);
 
 
 module.exports = router;

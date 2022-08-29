@@ -44,4 +44,21 @@ Citas.eliminar_citas = async (cita) => {
     }
 }
 
+//
+Citas.obtiene_citas_medico = async (id_medico) => {
+    try {
+        let datos = await pool.query("select id_cita,P.id, cedula, nombres||' '||apellidos as nombres, fecha,hora_empieza, hora_termina,C.estado from turnos T inner join citas C"+
+        " on T.id_turno=C.id_turno inner join persona P"+
+        " on C.id_paciente=P.id"+
+        " where C.estado='PENDIENTE' and T.id_medico="+id_medico);
+        if (datos.rowCount > 0)
+            return datos.rows;
+        else
+            return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 module.exports = Citas;
