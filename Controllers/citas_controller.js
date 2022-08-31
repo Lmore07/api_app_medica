@@ -21,11 +21,47 @@ cita.nueva_citayturno = async (req, res) => {
 }
 
 //Se obtienen las citas de un determinado paciente
+cita.obtener_info_citas = async (req, res) => {
+    try {
+        const { cita } = req.params;
+        console.log(cita);
+        let datos = await Citas.obtener_info_cita(cita);
+        if (datos != null) {
+            datos.estado = "1";
+            res.json(datos);
+        }
+        else
+            res.json({ estado: "0" });
+    }
+    catch (error) {
+        console.error();
+        res.json({ estado: 0 });
+    }
+}
+
+//Se obtienen las citas de un determinado paciente
 cita.obtener_citas_paciente = async (req, res) => {
     try {
         const { paciente } = req.params;
         console.log(paciente);
         let datos = await Citas.obtener_citas_paciente(paciente);
+        if (datos != null) {
+            datos.estado = "1";
+            res.json(datos);
+        }
+        else
+            res.json({ estado: "0" });
+    }
+    catch (error) {
+        console.error();
+        res.json({ estado: 0 });
+    }
+}
+
+cita.busqueda_citas = async (req, res) => {
+    try {
+        const { cedula } = req.params;
+        let datos = await Citas.obtener_citas_busqueda(cedula);
         if (datos != null) {
             datos.estado = "1";
             res.json(datos);
@@ -61,7 +97,6 @@ cita.obtener_citas_medico = async (req, res) => {
     try {
         const { id } = req.params;
         let datos = await Citas.obtiene_citas_medico(id);
-        console.log(datos);
         if (datos != null) {
             datos.estado = "1";
             res.json(datos);
@@ -74,4 +109,22 @@ cita.obtener_citas_medico = async (req, res) => {
         res.json({ estado: 0 });
     }
 }
+
+//
+cita.obtiene_citas_generales = async (req, res) => {
+    try {
+        let datos = await Citas.obtiene_citas_generales();
+        if (datos != null) {
+            datos.estado = "1";
+            res.json(datos);
+        }
+        else
+            res.json({ estado: "0" });
+    }
+    catch (error) {
+        console.error();
+        res.json({ estado: 0 });
+    }
+}
+
 module.exports = { cita };

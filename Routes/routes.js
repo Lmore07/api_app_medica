@@ -24,7 +24,11 @@ router.post("/usuarios/actualizacion", user.actualizar_informacion_personal);
 
 //CITAS Y TURNOS
 router.post("/citas/registro", cita.nueva_citayturno);
+router.get("/citas/generales", cita.obtiene_citas_generales);
 router.get("/paciente/citas/:paciente", cita.obtener_citas_paciente);
+router.get("/busqueda/citas/:cedula", cita.busqueda_citas);
+
+router.get("/paciente/citas/info/:cita", cita.obtener_info_citas);
 router.delete('/citas/eliminar/:cita', cita.eliminar_citas);
 router.get("/medico/citas/:id", cita.obtener_citas_medico);
 

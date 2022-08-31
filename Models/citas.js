@@ -16,6 +16,24 @@ Citas.registra_turnoycita = async (hora_empieza, hora_termina, fecha, id_medico,
 }
 
 //obtienes todos las citas de un paciente
+Citas.obtener_info_cita = async (cita) => {
+    try {
+        let datos = await pool.query("select motivo_ingreso,diagnostico,observaciones,medicamento,cantidad,descripcion from citas C inner join diagnostico D"+
+        " on C.id_cita=D.id_cita inner join receta R"+
+        " on D.id_diagnostico=R.id_diagnostico inner join detalles_receta DR"+
+        " on R.id_receta=DR.id_receta"+
+        " where C.id_cita="+cita);
+        if (datos.rowCount > 0)
+            return datos.rows;
+        else
+            return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+//obtienes todos las citas de un paciente
 Citas.obtener_citas_paciente = async (paciente) => {
     try {
         let datos = await pool.query("select C.id_cita,T.id_turno,T.id_medico, hora_empieza,hora_termina,especialidad, nombres||' '||apellidos as medico,fecha, C.estado "+
@@ -23,6 +41,26 @@ Citas.obtener_citas_paciente = async (paciente) => {
         "inner join medico M on M.id_medico=T.id_medico inner join persona P "+
         "on P.id=M.id_persona "+
         "where id_paciente="+paciente+" order by fecha");
+        if (datos.rowCount > 0)
+            return datos.rows;
+        else
+            return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+Citas.obtener_citas_busqueda = async (paciente) => {
+    try {
+        let datos = await pool.query("select (select  nombres||' '||apellidos as medico from persona PP inner join medico MM"+
+        " on PP.id=MM.id_persona where id_medico=T.id_medico), (select  especialidad from persona PP inner join medico MM"+
+        " on PP.id=MM.id_persona where id_medico=T.id_medico),"+
+        " id_cita,P.id, cedula, nombres||' '||apellidos as nombres, fecha,hora_empieza||' - '||hora_termina atencion,C.estado"+ 
+        " from turnos T inner join citas C"+
+        " on T.id_turno=C.id_turno inner join persona P"+
+        " on C.id_paciente=P.id"+
+        " where cedula like '%"+paciente+"%'");
         if (datos.rowCount > 0)
             return datos.rows;
         else
@@ -60,5 +98,26 @@ Citas.obtiene_citas_medico = async (id_medico) => {
         return null;
     }
 }
+
+//
+Citas.obtiene_citas_generales = async () => {
+    try {
+        let datos = await pool.query("select (select  nombres||' '||apellidos as medico from persona PP inner join medico MM"+
+        " on PP.id=MM.id_persona where id_medico=T.id_medico), (select  especialidad from persona PP inner join medico MM"+
+        " on PP.id=MM.id_persona where id_medico=T.id_medico),"+
+        " id_cita,P.id, cedula, nombres||' '||apellidos as nombres, fecha,hora_empieza||' - '||hora_termina atencion,C.estado"+ 
+        " from turnos T inner join citas C"+
+        " on T.id_turno=C.id_turno inner join persona P"+
+        " on C.id_paciente=P.id");
+        if (datos.rowCount > 0)
+            return datos.rows;
+        else
+            return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 
 module.exports = Citas;
