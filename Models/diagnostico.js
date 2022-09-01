@@ -5,7 +5,7 @@ const Usuario = require("./usuario");
 
 const Diagnostico = {}
 
-Diagnostico.registra_diagnostico = async (id_cita, diagnostico,observaciones,motivo_ingreso,id_paciente,fecha,medicacion) => {
+Diagnostico.registra_diagnostico = async (id_cita, diagnostico,observaciones,motivo_ingreso,id_paciente,fecha,medicacion,id_turnos) => {
     try {
             let datos = await pool.query("INSERT INTO diagnostico("+
                 " id_cita, diagnostico, observaciones, motivo_ingreso)"+
@@ -17,7 +17,7 @@ Diagnostico.registra_diagnostico = async (id_cita, diagnostico,observaciones,mot
             for (let i=0; i<medicacion.length; i++) {
             status = await Recetas.registra_receta_detalle(receta_id,medicacion[i].medicamento,medicacion[i].cantidad,medicacion[i].descripcion);
             }
-            status = await Usuario.actualiza_cita(id_paciente);
+            status = await Usuario.actualiza_cita(id_turnos);
             return 1;
     } catch (error) {
         return 0;

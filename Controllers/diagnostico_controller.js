@@ -10,8 +10,8 @@ const diagnostico = {}
 
 diagnostico.nuevo_diagnostico = async (req, res) => {
     try {
-        const { id_cita, diagnostico,observaciones,motivo_ingreso,id_paciente,fecha,medicacion } = req.body; 
-        let status = await Diagnostico.registra_diagnostico(id_cita, diagnostico,observaciones,motivo_ingreso,id_paciente,fecha,medicacion);
+        const { id_cita, diagnostico,observaciones,motivo_ingreso,id_paciente,fecha,medicacion,id_turnos } = req.body; 
+        let status = await Diagnostico.registra_diagnostico(id_cita, diagnostico,observaciones,motivo_ingreso,id_paciente,fecha,medicacion,id_turnos);
         if (status === 1)
             res.json({ mensaje: "Registro correcto", estado: "1" });
         else

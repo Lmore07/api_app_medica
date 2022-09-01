@@ -240,7 +240,7 @@ Usuario.actualiza_cita = async (id_paciente) => {
     try {
             let datos = await pool.query("UPDATE citas"+
             " SET estado='ATENDIDO'"+
-            " WHERE id_paciente="+id_paciente);
+            " WHERE id_turno="+id_paciente);
             
         return 1;
     } catch (error) {
