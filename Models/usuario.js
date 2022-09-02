@@ -100,7 +100,7 @@ Usuario.valida_cedula = async (cedula) => {
 //INICIO DE SESION
 Usuario.inciarSesion = async (usuario, clave) => {
     try {
-        let datos = await pool.query("select password, rol, cedula,id from persona where correo='"+usuario+"'");
+        let datos = await pool.query("select password, rol, cedula,id, estado from persona where correo='"+usuario+"'");
         if(clave==datos.rows[0].password){
             return datos;
         }else{
