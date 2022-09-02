@@ -15,6 +15,18 @@ Citas.registra_turnoycita = async (hora_empieza, hora_termina, fecha, id_medico,
     }
 }
 
+//
+Citas.actualiza_datos_cita = async (hora_empieza, hora_termina, fecha, id_medico,id_turno) => {
+    try {
+            let datos = await pool.query("UPDATE turnos"+
+            " SET fecha='"+fecha+"', id_medico="+id_medico+", hora_empieza='"+hora_empieza+"', hora_termina='"+hora_termina+"'"+
+            " WHERE id_turno="+id_turno+";");
+            return 1;
+    } catch (error) {
+        return 0;
+    }
+}
+
 //obtienes todos las citas de un paciente
 Citas.obtener_info_cita = async (cita) => {
     try {

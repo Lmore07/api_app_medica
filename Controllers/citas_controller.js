@@ -20,6 +20,20 @@ cita.nueva_citayturno = async (req, res) => {
     }
 }
 
+cita.modificar_citas = async (req, res) => {
+    try {
+        const { hora_empieza, hora_termina, fecha, id_medico,id_turno } = req.body; 
+        let status = await Citas.actualiza_datos_cita(hora_empieza, hora_termina, fecha, id_medico,id_turno);
+        if (status === 1)
+            res.json({ mensaje: "Modicicación correcta", estado: "1" });
+        else
+            res.json({ mensaje: "No se modificó la cita", estado: "0" });
+    }
+    catch (error) {
+        res.json({ mensaje: "El sistema falló",estado: 0 });
+    }
+}
+
 //Se obtienen las citas de un determinado paciente
 cita.obtener_info_citas = async (req, res) => {
     try {

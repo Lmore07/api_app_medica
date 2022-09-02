@@ -37,15 +37,15 @@ Usuario.listar_medicos = async () => {
 //Se registra una nueva persona
 Usuario.registrapersona = async (cedula,nombres, apellidos, correo, password,direccion, fecha_naci, celular,rol,especialidad,fecha_registro) => {
     try {
-        console.log(celular);
         if(rol =='MEDICO'){
-            console.log(especialidad);
             let datos = await pool.query("INSERT INTO persona("+
             "cedula, nombres, apellidos, correo, password, fecha_naci, direccion, celular, rol,estado)"+
             "VALUES ('"+cedula+"', '"+nombres+"', '"+apellidos+"', '"+correo+"', '"+password+"', '"+fecha_naci+"', '"+direccion+"','"+celular+"', 'MEDICO','PENDIENTE');");
             datos = await pool.query("select max(id) as id from persona");
+            console.log(datos);
             let id=datos.rows[0].id;
-            datos=await pool.query("INSERT INTO medico(id_persona, especialidad,fecha_registro) VALUES ("+id+", '"+especialidad+"', '"+fecha_registro+"');");
+            console.log(id, especialidad,fecha_registro);
+            datos=await pool.query("INSERT INTO medico(id_persona, especialidad) VALUES ("+id+", '"+especialidad+"');");
         }else if(rol=='PACIENTE'){
             let datos = await pool.query("INSERT INTO persona("+
             "cedula, nombres, apellidos, correo, password, fecha_naci, direccion, celular, rol,estado)"+
