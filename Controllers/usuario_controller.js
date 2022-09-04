@@ -65,7 +65,7 @@ user.iniciarSesion = async (req, res) => {
             //console.log(encrypted);
             let datos = await Usuario.inciarSesion(usuario, clave);
             if (datos !== 0 && datos !== null) {
-                res.json({ mensaje: "Sesion iniciada", estado: datos.rows[0].rol, cedula:datos.rows[0].cedula, id:datos.rows[0].id,estado_s:datos.rows[0].estado});
+                res.json({ mensaje: "Sesion iniciada", estado: datos.rows[0].rol, cedula:datos.rows[0].cedula, id:datos.rows[0].id,estado_s:datos.rows[0].estado,nombres:datos.rows[0].nombres});
             }
             else
                 res.json({ mensaje: "Ingreso fallido", estado: "0" });
