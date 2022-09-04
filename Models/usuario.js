@@ -34,6 +34,23 @@ Usuario.listar_medicos = async () => {
     }
 }
 
+//medicos activos
+Usuario.medicos_activos = async () => {
+    try {
+        let datos = await pool.query("select P.id, cedula, nombres, apellidos,especialidad,direccion,celular,correo,estado from medico M inner join "+
+        "persona P on M.id_persona=P.id where estado='ACTIVO'");
+        if (datos.rowCount > 0)
+        {
+            return datos.rows;
+        }
+        else
+            return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 //Se registra una nueva persona
 Usuario.registrapersona = async (cedula,nombres, apellidos, correo, password,direccion, fecha_naci, celular,rol,especialidad,fecha_registro) => {
     try {

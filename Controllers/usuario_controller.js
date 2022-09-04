@@ -37,6 +37,17 @@ user.listar_medicos = async (req, res) => {
     }
 }
 
+//medicos activos
+user.medicos_activos = async (req, res) => {
+    try {
+        const datos = await Usuario.medicos_activos();
+        res.json(datos);
+    } catch (error) {
+        console.log(error);
+        res.json({ estado: 0 });
+    }
+}
+
 //se agrega una nueva persona
 user.nuevapersona = async (req, res) => {
     try {

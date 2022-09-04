@@ -8,6 +8,7 @@ const router = Router();
 // Admin
 router.get("/admin/usuarios/pacientes", user.listar_pacientes);
 router.get("/admin/usuarios/medicos", user.listar_medicos);
+router.get("/usuarios/medicos", user.medicos_activos);
 router.delete('/medicos/eliminar/:id', user.eliminar_medicos);
 router.delete('/pacientes/eliminar/:id', user.eliminar_pacientes);
 router.post("/admin/aprobar", user.aprobar_medico);
