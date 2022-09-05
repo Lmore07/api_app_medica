@@ -158,6 +158,21 @@ Usuario.obtener_nombres_medicos = async (especialidad) => {
     }
 }
 
+//obtiene turnos
+Usuario.obtiene_turnos = async (fecha,medico) => {
+    try {
+        let datos = await pool.query("select hora_empieza as hora from turnos where fecha='"+fecha+"' and id_medico="+medico);
+        console.log(datos.rows);
+        if (datos.rowCount > 0)
+            return datos.rows;
+        else
+            return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 Usuario.ver_perfil = async (cedula) => {
     try {
         let datos = await pool.query("select cedula,nombres,apellidos,direccion,celular,fecha_naci,especialidad from persona P left join medico M "+

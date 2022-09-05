@@ -31,9 +31,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use("/api/", require("./Routes/routes"));
 
-
-
-
 const mensajes=[]
 
 io.on('connection', function(socket){

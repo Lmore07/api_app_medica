@@ -48,6 +48,18 @@ user.medicos_activos = async (req, res) => {
     }
 }
 
+//turnos disponibles
+user.turnos_disponibles = async (req, res) => {
+    try {
+        const { fecha,medico } = req.body;
+        const datos = await Usuario.obtiene_turnos(fecha,medico);
+        res.json(datos);
+    } catch (error) {
+        console.log(error);
+        res.json({ estado: 0 });
+    }
+}
+
 //se agrega una nueva persona
 user.nuevapersona = async (req, res) => {
     try {

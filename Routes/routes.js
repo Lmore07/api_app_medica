@@ -26,6 +26,7 @@ router.post("/usuarios/actualizacion", user.actualizar_informacion_personal);
 //CITAS Y TURNOS
 router.post("/citas/registro", cita.nueva_citayturno);
 router.post("/citas/editar", cita.modificar_citas);
+router.post("/turnos", user.turnos_disponibles);
 router.get("/citas/generales", cita.obtiene_citas_generales);
 router.get("/paciente/citas/:paciente", cita.obtener_citas_paciente);
 router.get("/busqueda/citas/:cedula", cita.busqueda_citas);
