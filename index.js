@@ -8,14 +8,14 @@ const multer = require('multer');
 const path = require('path');
 const app = express();
 const serverHttp = require('http').Server(app);
+app.use(cors());
 const io= require('socket.io')(serverHttp, {
     cors: {
-      origin: "https://app-medica-oss.herokuapp.com/",
+      origin: "*",
       methods: ["GET", "POST"]
     }
   });
 
-app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 const fecha = Date.now();
 const storage = multer.diskStorage({
