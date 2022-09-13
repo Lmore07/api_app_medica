@@ -10,7 +10,7 @@ const app = express();
 const serverHttp = require('http').Server(app);
 const io= require('socket.io')(serverHttp, {
     cors: {
-      origin: "*",
+      origin: "https://app-medica-oss.herokuapp.com/",
       methods: ["GET", "POST"]
     }
   });
